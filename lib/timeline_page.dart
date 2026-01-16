@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'widgets/custom_app_bar.dart';
-import 'widgets/app_drawer.dart';
 
 // Task model for timeline
 class TimelineTask {
@@ -34,17 +32,15 @@ class TimelinePage extends StatefulWidget {
 }
 
 class _TimelinePageState extends State<TimelinePage> {
-  // Calendar state
   DateTime _focusedDay = DateTime.now();
   DateTime _selectedDay = DateTime.now();
   CalendarFormat _calendarFormat = CalendarFormat.month;
-  
-  // Sample timeline tasks
-  List<TimelineTask> timelineTasks = [
+
+  final List<TimelineTask> timelineTasks = [
     TimelineTask(
       id: '1',
       title: 'Project Kickoff',
-      description: 'Initial project meeting and planning',
+      description: 'Initial meeting',
       startDate: DateTime.now().subtract(const Duration(days: 5)),
       endDate: DateTime.now().subtract(const Duration(days: 4)),
       status: 'Completed',
@@ -54,7 +50,7 @@ class _TimelinePageState extends State<TimelinePage> {
     TimelineTask(
       id: '2',
       title: 'Design Phase',
-      description: 'UI/UX design and prototyping',
+      description: 'UI/UX design',
       startDate: DateTime.now().subtract(const Duration(days: 3)),
       endDate: DateTime.now().add(const Duration(days: 7)),
       status: 'In Progress',
@@ -64,202 +60,45 @@ class _TimelinePageState extends State<TimelinePage> {
     TimelineTask(
       id: '3',
       title: 'Development',
-      description: 'Backend and frontend development',
+      description: 'Development work',
       startDate: DateTime.now().add(const Duration(days: 5)),
       endDate: DateTime.now().add(const Duration(days: 20)),
       status: 'Scheduled',
       priority: 'Medium',
       assignee: 'Robert Johnson',
     ),
-    TimelineTask(
-      id: '4',
-      title: 'Testing',
-      description: 'Quality assurance and bug fixes',
-      startDate: DateTime.now().add(const Duration(days: 18)),
-      endDate: DateTime.now().add(const Duration(days: 25)),
-      status: 'Scheduled',
-      priority: 'Medium',
-      assignee: 'Emily Davis',
-    ),
-    TimelineTask(
-      id: '5',
-      title: 'Deployment',
-      description: 'Production deployment',
-      startDate: DateTime.now().add(const Duration(days: 24)),
-      endDate: DateTime.now().add(const Duration(days: 26)),
-      status: 'Scheduled',
-      priority: 'High',
-      assignee: 'Michael Wilson',
-    ),
   ];
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF1A1F26),
-      appBar: CustomAppBar(
-        title: 'Timeline & Schedule',
-        onMenuPressed: () {
-          Scaffold.of(context).openDrawer();
-        },
-        onNotificationPressed: () {
-          // Handle notification tap
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Notifications tapped')),
-          );
-        },
-        onProfilePressed: () {
-          // Handle profile tap
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Profile tapped')),
-          );
-        },
-      ),
-      drawer: AppDrawer(
-        userName: 'John Doe',
-        userEmail: 'john.doe@example.com',
-        onLogout: () {
-          // Handle logout
-          Navigator.pop(context);
-          Navigator.pushNamedAndRemoveUntil(
-            context,
-            '/login',
-            (route) => false,
-          );
-        },
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Month/Year selector with calendar view
-              Container(
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF2D3748),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: TableCalendar(
-                  focusedDay: _focusedDay,
-                  firstDay: DateTime.utc(2020, 1, 1),
-                  lastDay: DateTime.utc(2030, 12, 31),
-                  calendarFormat: _calendarFormat,
-                  selectedDayPredicate: (day) {
-                    return isSameDay(_selectedDay, day);
-                  },
-                  onDaySelected: (selectedDay, focusedDay) {
-                    setState(() {
-                      _selectedDay = selectedDay;
-                      _focusedDay = focusedDay;
-                    });
-                  },
-                  onFormatChanged: (format) {
-                    setState(() {
-                      _calendarFormat = format;
-                    });
-                  },
-                  onPageChanged: (focusedDay) {
-                    _focusedDay = focusedDay;
-                  },
-                  calendarStyle: const CalendarStyle(
-                    todayDecoration: BoxDecoration(
-                      color: Color(0xFF4FD1C5),
-                      shape: BoxShape.circle,
-                    ),
-                    selectedDecoration: BoxDecoration(
-                      color: Colors.blue,
-                      shape: BoxShape.circle,
-                    ),
-                    markerDecoration: BoxDecoration(
-                      color: Colors.purple,
-                      shape: BoxShape.circle,
-                    ),
-                    todayTextStyle: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1A1F26),
-                    ),
-                    defaultTextStyle: TextStyle(
-                      color: Colors.white,
-                    ),
-                    weekendTextStyle: TextStyle(
-                      color: Colors.white70,
-                    ),
-                  ),
-                  headerStyle: const HeaderStyle(
-                    titleCentered: true,
-                    formatButtonVisible: false,
-                    leftChevronIcon: Icon(
-                      Icons.chevron_left,
-                      color: Color(0xFF4FD1C5),
-                    ),
-                    rightChevronIcon: Icon(
-                      Icons.chevron_right,
-                      color: Color(0xFF4FD1C5),
-                    ),
-                    titleTextStyle: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  daysOfWeekStyle: const DaysOfWeekStyle(
-                    weekdayStyle: TextStyle(
-                      color: Colors.white70,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    weekendStyle: TextStyle(
-                      color: Colors.white38,
-                    ),
-                  ),
-                ),
-              ),
-              
-              const SizedBox(height: 24),
-              
-              // This Week Section
-              _buildSectionHeader('This Week'),
-              const SizedBox(height: 12),
-              _buildThisWeekTasks(),
-              
-              const SizedBox(height: 24),
-              
-              // Upcoming Section
-              _buildSectionHeader('Upcoming'),
-              const SizedBox(height: 12),
-              _buildUpcomingTasks(),
-              
-              const SizedBox(height: 24),
-              
-              // Overdue Section
-              _buildSectionHeader('Overdue'),
-              const SizedBox(height: 12),
-              _buildOverdueTasks(),
-              
-              const SizedBox(height: 24),
-              
-              // Upcoming Deadlines Section
-              _buildSectionHeader('Upcoming Deadlines'),
-              const SizedBox(height: 12),
-              _buildUpcomingDeadlines(),
-              
-              const SizedBox(height: 24),
-              
-              // Task Timeline (Gantt) Section
-              _buildSectionHeader('Task Timeline (Gantt)'),
-              const SizedBox(height: 12),
-              _buildGanttChart(),
-            ],
-          ),
-        ),
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          // 📅 Calendar
+          _calendar(),
+
+          const SizedBox(height: 24),
+
+          _sectionTitle('This Week'),
+          const SizedBox(height: 12),
+          _taskList(_thisWeekTasks()),
+
+          const SizedBox(height: 24),
+
+          _sectionTitle('Upcoming'),
+          const SizedBox(height: 12),
+          _taskList(_upcomingTasks()),
+        ]),
       ),
     );
   }
 
-  Widget _buildSectionHeader(String title) {
+  // ---------------- UI ----------------
+
+  Widget _sectionTitle(String text) {
     return Text(
-      title,
+      text,
       style: const TextStyle(
         color: Color(0xFF4FD1C5),
         fontSize: 18,
@@ -268,62 +107,54 @@ class _TimelinePageState extends State<TimelinePage> {
     );
   }
 
-  Widget _buildThisWeekTasks() {
-    final thisWeekTasks = timelineTasks.where((task) {
-      final now = DateTime.now();
-      final startOfWeek = DateTime(now.year, now.month, now.day - now.weekday + 1);
-      final endOfWeek = DateTime(startOfWeek.year, startOfWeek.month, startOfWeek.day + 6);
-      return (task.startDate.isAfter(startOfWeek) || isSameDay(task.startDate, startOfWeek)) &&
-             (task.startDate.isBefore(endOfWeek) || isSameDay(task.startDate, endOfWeek));
-    }).toList();
-
-    if (thisWeekTasks.isEmpty) {
-      return _buildEmptySection('No tasks scheduled for this week');
-    }
-
-    return _buildTaskList(thisWeekTasks);
+  Widget _calendar() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF2D3748),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: TableCalendar(
+        focusedDay: _focusedDay,
+        firstDay: DateTime.utc(2020),
+        lastDay: DateTime.utc(2030),
+        calendarFormat: _calendarFormat,
+        selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+        onDaySelected: (d, f) => setState(() {
+          _selectedDay = d;
+          _focusedDay = f;
+        }),
+        onFormatChanged: (f) => setState(() => _calendarFormat = f),
+        calendarStyle: const CalendarStyle(
+          todayDecoration: BoxDecoration(
+            color: Color(0xFF4FD1C5),
+            shape: BoxShape.circle,
+          ),
+          selectedDecoration: BoxDecoration(
+            color: Colors.blue,
+            shape: BoxShape.circle,
+          ),
+          defaultTextStyle: TextStyle(color: Colors.white),
+          weekendTextStyle: TextStyle(color: Colors.white70),
+        ),
+        headerStyle: const HeaderStyle(
+          titleCentered: true,
+          formatButtonVisible: false,
+          titleTextStyle: TextStyle(color: Colors.white),
+          leftChevronIcon:
+              Icon(Icons.chevron_left, color: Color(0xFF4FD1C5)),
+          rightChevronIcon:
+              Icon(Icons.chevron_right, color: Color(0xFF4FD1C5)),
+        ),
+      ),
+    );
   }
 
-  Widget _buildUpcomingTasks() {
-    final upcomingTasks = timelineTasks.where((task) {
-      return task.startDate.isAfter(DateTime.now());
-    }).toList();
-
-    if (upcomingTasks.isEmpty) {
-      return _buildEmptySection('No upcoming tasks');
+  Widget _taskList(List<TimelineTask> tasks) {
+    if (tasks.isEmpty) {
+      return _emptyBox('No tasks found');
     }
 
-    return _buildTaskList(upcomingTasks);
-  }
-
-  Widget _buildOverdueTasks() {
-    final overdueTasks = timelineTasks.where((task) {
-      return task.endDate.isBefore(DateTime.now()) && task.status != 'Completed';
-    }).toList();
-
-    if (overdueTasks.isEmpty) {
-      return _buildEmptySection('No overdue tasks');
-    }
-
-    return _buildTaskList(overdueTasks);
-  }
-
-  Widget _buildUpcomingDeadlines() {
-    final deadlineTasks = timelineTasks.where((task) {
-      final nextWeek = DateTime.now().add(const Duration(days: 7));
-      return task.endDate.isAfter(DateTime.now()) && 
-             (task.endDate.isBefore(nextWeek) || isSameDay(task.endDate, nextWeek)) &&
-             task.status != 'Completed';
-    }).toList();
-
-    if (deadlineTasks.isEmpty) {
-      return _buildEmptySection('No upcoming deadlines');
-    }
-
-    return _buildTaskList(deadlineTasks);
-  }
-
-  Widget _buildTaskList(List<TimelineTask> tasks) {
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFF2D3748),
@@ -333,192 +164,71 @@ class _TimelinePageState extends State<TimelinePage> {
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: tasks.length,
-        separatorBuilder: (context, index) => const Divider(height: 1, color: Color(0xFF1A1F26)),
-        itemBuilder: (context, index) {
-          final task = tasks[index];
+        separatorBuilder: (_, __) =>
+            const Divider(height: 1, color: Color(0xFF1A1F26)),
+        itemBuilder: (_, i) {
+          final t = tasks[i];
           return ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            title: Text(
-              task.title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+            title: Text(t.title,
+                style: const TextStyle(color: Colors.white)),
             subtitle: Text(
-              '${_formatDate(task.startDate)} - ${_formatDate(task.endDate)} | ${task.assignee}',
-              style: const TextStyle(
-                color: Colors.grey,
-              ),
+              '${_fmt(t.startDate)} - ${_fmt(t.endDate)} | ${t.assignee}',
+              style: const TextStyle(color: Colors.grey, fontSize: 12),
             ),
-            trailing: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: _getStatusColor(task.status),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                task.status,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                ),
-              ),
-            ),
+            trailing: _badge(t.status, _statusColor(t.status)),
           );
         },
       ),
     );
   }
 
-  Widget _buildEmptySection(String message) {
+  Widget _badge(String text, Color color) {
     return Container(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration:
+          BoxDecoration(color: color, borderRadius: BorderRadius.circular(12)),
+      child:
+          Text(text, style: const TextStyle(color: Colors.white, fontSize: 11)),
+    );
+  }
+
+  Widget _emptyBox(String text) {
+    return Container(
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: const Color(0xFF2D3748),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Center(
-        child: Text(
-          message,
-          style: const TextStyle(
-            color: Colors.grey,
-            fontStyle: FontStyle.italic,
-          ),
-        ),
+        child: Text(text,
+            style: const TextStyle(color: Colors.grey)),
       ),
     );
   }
 
-  Widget _buildGanttChart() {
-    // Simple representation of a Gantt chart
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: const Color(0xFF2D3748),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        children: timelineTasks.map((task) {
-          final duration = task.endDate.difference(task.startDate).inDays;
-          final progress = task.status == 'Completed' ? 1.0 : 
-                           task.status == 'In Progress' ? 0.6 : 0.0;
-          
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: Text(
-                        task.title,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: _getStatusColor(task.status),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        task.status,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 1,
-                      child: Text(
-                        _formatDate(task.startDate),
-                        style: const TextStyle(
-                          color: Colors.grey,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 3,
-                      child: Stack(
-                        children: [
-                          Container(
-                            height: 20,
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade800,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          Container(
-                            height: 20,
-                            width: MediaQuery.of(context).size.width * 0.6 * progress,
-                            decoration: BoxDecoration(
-                              color: _getPriorityColor(task.priority),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: Text(
-                        _formatDate(task.endDate),
-                        style: const TextStyle(
-                          color: Colors.grey,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          );
-        }).toList(),
-      ),
-    );
+  // ---------------- DATA ----------------
+
+  List<TimelineTask> _thisWeekTasks() {
+    final now = DateTime.now();
+    return timelineTasks
+        .where((t) =>
+            t.startDate.isBefore(now.add(const Duration(days: 7))) &&
+            t.endDate.isAfter(now))
+        .toList();
   }
 
-  Color _getStatusColor(String status) {
-    switch (status) {
-      case 'Completed':
-        return Colors.green.shade600;
-      case 'In Progress':
-        return Colors.orange.shade600;
-      case 'Overdue':
-        return Colors.red.shade600;
-      default:
-        return Colors.blue.shade600;
-    }
+  List<TimelineTask> _upcomingTasks() {
+    return timelineTasks
+        .where((t) => t.startDate.isAfter(DateTime.now()))
+        .toList();
   }
 
-  Color _getPriorityColor(String priority) {
-    switch (priority) {
-      case 'High':
-        return Colors.red.shade600;
-      case 'Medium':
-        return Colors.orange.shade600;
-      case 'Low':
-        return Colors.green.shade600;
-      default:
-        return Colors.grey.shade600;
-    }
-  }
+  Color _statusColor(String s) =>
+      s == 'Completed'
+          ? Colors.green
+          : s == 'In Progress'
+              ? Colors.orange
+              : Colors.blue;
 
-  String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year}';
-  }
+  String _fmt(DateTime d) => '${d.day}/${d.month}/${d.year}';
 }

@@ -8,6 +8,7 @@ import 'timeline_page.dart'; // Import the timeline page
 import 'team_view_page.dart'; // Import the team view page
 import 'remarks_page.dart'; // Import the remarks page
 import 'reports_page.dart'; // Import the reports page
+import 'home_page.dart'; // Import the home page
 import 'widgets/custom_app_bar.dart';
 import 'widgets/app_drawer.dart';
 
@@ -47,6 +48,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => const SplashScreen(),
         '/login': (context) => const LoginPage(),
         '/signup': (context) => const SignupPage(),
+        '/home': (context) => HomePage(),
         '/dashboard': (context) => const DashboardPage(),
         '/task-list': (context) => const TaskListPage(),
         '/status-insights': (context) => const StatusInsightsPage(),

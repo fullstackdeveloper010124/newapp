@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'widgets/custom_app_bar.dart';
-import 'widgets/app_drawer.dart';
 
 // Models
 class Remark {
@@ -41,7 +39,9 @@ class RemarksPage extends StatefulWidget {
 class _RemarksPageState extends State<RemarksPage> {
   String _selectedUser = 'All Users';
   String _searchQuery = '';
-  
+
+  final TextEditingController _remarkController = TextEditingController();
+
   // Sample remarks data
   List<Remark> remarks = [
     Remark(
@@ -60,108 +60,38 @@ class _RemarksPageState extends State<RemarksPage> {
       status: 'Resolved',
       contributors: ['Bob Smith'],
     ),
-    Remark(
-      id: '3',
-      user: 'Carol Davis',
-      content: 'Need to optimize the database queries for better performance',
-      timestamp: DateTime.now().subtract(const Duration(days: 1)),
-      status: 'Active',
-      contributors: ['Carol Davis', 'David Wilson', 'Emma Thompson'],
-    ),
-    Remark(
-      id: '4',
-      user: 'David Wilson',
-      content: 'Updated the documentation for the new API endpoints',
-      timestamp: DateTime.now().subtract(const Duration(days: 2)),
-      status: 'Resolved',
-      contributors: ['David Wilson', 'Alice Johnson'],
-    ),
-    Remark(
-      id: '5',
-      user: 'Emma Thompson',
-      content: 'Consider implementing caching mechanism for faster response times',
-      timestamp: DateTime.now().subtract(const Duration(days: 3)),
-      status: 'Active',
-      contributors: ['Emma Thompson', 'Bob Smith', 'Carol Davis'],
-    ),
   ];
-  
-  // Sample contributors data
+
   List<Contributor> contributors = [
     Contributor(name: 'Alice Johnson', contributionCount: 12),
     Contributor(name: 'Bob Smith', contributionCount: 8),
     Contributor(name: 'Carol Davis', contributionCount: 15),
-    Contributor(name: 'David Wilson', contributionCount: 6),
-    Contributor(name: 'Emma Thompson', contributionCount: 10),
   ];
-
-  // Controllers
-  final TextEditingController _remarkController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF1A1F26),
-      appBar: CustomAppBar(
-        title: 'Remarks',
-        onMenuPressed: () {
-          Scaffold.of(context).openDrawer();
-        },
-        onNotificationPressed: () {
-          // Handle notification tap
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Notifications tapped')),
-          );
-        },
-        onProfilePressed: () {
-          // Handle profile tap
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Profile tapped')),
-          );
-        },
-      ),
-      drawer: AppDrawer(
-        userName: 'John Doe',
-        userEmail: 'john.doe@example.com',
-        onLogout: () {
-          // Handle logout
-          Navigator.pop(context);
-          Navigator.pushNamedAndRemoveUntil(
-            context,
-            '/login',
-            (route) => false,
-          );
-        },
-      ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Add New Remark section
               _buildAddRemarkSection(),
-              
               const SizedBox(height: 24),
-              
-              // Stats section
+
               _buildStatsSection(),
-              
               const SizedBox(height: 24),
-              
-              // Filters and search
+
               _buildFiltersSection(),
-              
               const SizedBox(height: 24),
-              
-              // Communication Timeline
+
               _buildSectionHeader('Communication Timeline'),
               const SizedBox(height: 12),
               _buildCommunicationTimeline(),
-              
+
               const SizedBox(height: 24),
-              
-              // Contribution Overview
               _buildSectionHeader('Contribution Overview'),
               const SizedBox(height: 12),
               _buildContributionOverview(),
@@ -172,326 +102,7 @@ class _RemarksPageState extends State<RemarksPage> {
     );
   }
 
-  Widget _buildAddRemarkSection() {
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: const Color(0xFF2D3748),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        children: [
-          TextField(
-            controller: _remarkController,
-            maxLines: 3,
-            style: const TextStyle(color: Colors.white),
-            decoration: InputDecoration(
-              hintText: 'Add a new remark...',
-              hintStyle: const TextStyle(color: Colors.grey),
-              filled: true,
-              fillColor: const Color(0xFF1A1F26),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
-              ),
-              contentPadding: const EdgeInsets.all(16),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Align(
-            alignment: Alignment.centerRight,
-            child: ElevatedButton(
-              onPressed: () {
-                _addNewRemark();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF4FD1C5),
-                foregroundColor: const Color(0xFF1A1F26),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: const Text(
-                'Add Remark',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatsSection() {
-    int totalRemarks = remarks.length;
-    int activeTasks = remarks.where((remark) => remark.status == 'Active').length;
-    int resolved = remarks.where((remark) => remark.status == 'Resolved').length;
-    int totalContributors = contributors.length;
-
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: const Color(0xFF2D3748),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: _buildStatItem('Total Remarks', totalRemarks.toString(), Colors.blue.shade600),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildStatItem('Active', activeTasks.toString(), Colors.orange.shade600),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _buildStatItem('Resolved', resolved.toString(), Colors.green.shade600),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildStatItem('Contributors', totalContributors.toString(), Colors.purple.shade600),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFiltersSection() {
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: const Color(0xFF2D3748),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        children: [
-          // User filter dropdown
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: DropdownButtonFormField<String>(
-              initialValue: _selectedUser,
-              decoration: const InputDecoration(
-                labelText: 'Filter by User',
-                labelStyle: TextStyle(color: Color(0xFF4FD1C5)),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(8)),
-                ),
-                filled: true,
-                fillColor: Color(0xFF1A1F26),
-              ),
-              dropdownColor: const Color(0xFF2D3748),
-              style: const TextStyle(color: Colors.white),
-              items: ['All Users', 'Alice Johnson', 'Bob Smith', 'Carol Davis', 'David Wilson', 'Emma Thompson']
-                  .map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  _selectedUser = newValue!;
-                });
-              },
-            ),
-          ),
-          const SizedBox(height: 12),
-          // Search remarks
-          TextField(
-            onChanged: (value) {
-              setState(() {
-                _searchQuery = value;
-              });
-            },
-            style: const TextStyle(color: Colors.white),
-            decoration: InputDecoration(
-              hintText: 'Search remarks...',
-              hintStyle: const TextStyle(color: Colors.grey),
-              filled: true,
-              fillColor: const Color(0xFF1A1F26),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide.none,
-              ),
-              prefixIcon: const Icon(
-                Icons.search,
-                color: Color(0xFF4FD1C5),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCommunicationTimeline() {
-    final filteredRemarks = _getFilteredRemarks();
-
-    if (filteredRemarks.isEmpty) {
-      return Container(
-        padding: const EdgeInsets.all(16.0),
-        decoration: BoxDecoration(
-          color: const Color(0xFF2D3748),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: const Center(
-          child: Text(
-            'No remarks found',
-            style: TextStyle(
-              color: Colors.grey,
-              fontStyle: FontStyle.italic,
-            ),
-          ),
-        ),
-      );
-    }
-
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFF2D3748),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: ListView.separated(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: filteredRemarks.length,
-        separatorBuilder: (context, index) => const Divider(height: 1, color: Color(0xFF1A1F26)),
-        itemBuilder: (context, index) {
-          final remark = filteredRemarks[index];
-          return ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            leading: CircleAvatar(
-              backgroundColor: const Color(0xFF4FD1C5),
-              child: Text(
-                remark.user.substring(0, 1),
-                style: const TextStyle(
-                  color: Color(0xFF1A1F26),
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            title: Row(
-              children: [
-                Text(
-                  remark.user,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: _getStatusColor(remark.status),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    remark.status,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 4),
-                Text(
-                  remark.content,
-                  style: const TextStyle(
-                    color: Colors.white70,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  _formatDateTime(remark.timestamp),
-                  style: const TextStyle(
-                    color: Colors.grey,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
-            trailing: Text(
-              '${remark.contributors.length} contributors',
-              style: const TextStyle(
-                color: Colors.grey,
-                fontSize: 12,
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildContributionOverview() {
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: const Color(0xFF2D3748),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        children: contributors.map((contributor) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: Row(
-              children: [
-                Container(
-                  width: 32,
-                  height: 32,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF4FD1C5),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Text(
-                      contributor.name.substring(0, 1),
-                      style: const TextStyle(
-                        color: Color(0xFF1A1F26),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    contributor.name,
-                    style: const TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-                Text(
-                  '${contributor.contributionCount} remarks',
-                  style: const TextStyle(
-                    color: Color(0xFF4FD1C5),
-                  ),
-                ),
-              ],
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
+  // ---------------- UI SECTIONS ----------------
 
   Widget _buildSectionHeader(String title) {
     return Text(
@@ -504,29 +115,26 @@ class _RemarksPageState extends State<RemarksPage> {
     );
   }
 
-  Widget _buildStatItem(String title, String value, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(12.0),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1A1F26),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
+  Widget _buildAddRemarkSection() {
+    return _card(
+      Column(
         children: [
-          Text(
-            value,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+          TextField(
+            controller: _remarkController,
+            maxLines: 3,
+            style: const TextStyle(color: Colors.white),
+            decoration: _inputDecoration('Add a new remark...'),
           ),
-          const SizedBox(height: 4),
-          Text(
-            title,
-            style: TextStyle(
-              color: Colors.grey.shade400,
-              fontSize: 12,
+          const SizedBox(height: 12),
+          Align(
+            alignment: Alignment.centerRight,
+            child: ElevatedButton(
+              onPressed: _addNewRemark,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF4FD1C5),
+                foregroundColor: const Color(0xFF1A1F26),
+              ),
+              child: const Text('Add Remark'),
             ),
           ),
         ],
@@ -534,55 +142,175 @@ class _RemarksPageState extends State<RemarksPage> {
     );
   }
 
+  Widget _buildStatsSection() {
+    return _card(
+      Row(
+        children: [
+          Expanded(child: _stat('Total', remarks.length, Colors.blue)),
+          const SizedBox(width: 12),
+          Expanded(child: _stat('Active', remarks.where((e) => e.status == 'Active').length, Colors.orange)),
+          const SizedBox(width: 12),
+          Expanded(child: _stat('Resolved', remarks.where((e) => e.status == 'Resolved').length, Colors.green)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFiltersSection() {
+    return _card(
+      Column(
+        children: [
+          DropdownButtonFormField<String>(
+            value: _selectedUser,
+            dropdownColor: const Color(0xFF2D3748),
+            style: const TextStyle(color: Colors.white),
+            decoration: _inputDecoration('Filter by User'),
+            items: ['All Users', 'Alice Johnson', 'Bob Smith']
+                .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                .toList(),
+            onChanged: (v) => setState(() => _selectedUser = v!),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            onChanged: (v) => setState(() => _searchQuery = v),
+            style: const TextStyle(color: Colors.white),
+            decoration: _inputDecoration('Search remarks', icon: Icons.search),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCommunicationTimeline() {
+    final list = _getFilteredRemarks();
+
+    if (list.isEmpty) {
+      return _card(
+        const Center(
+          child: Text(
+            'No remarks found',
+            style: TextStyle(color: Colors.grey),
+          ),
+        ),
+      );
+    }
+
+    return _card(
+      Column(
+        children: list.map((r) {
+          return ListTile(
+            leading: CircleAvatar(
+              backgroundColor: const Color(0xFF4FD1C5),
+              child: Text(r.user[0], style: const TextStyle(color: Colors.black)),
+            ),
+            title: Text(r.user, style: const TextStyle(color: Colors.white)),
+            subtitle: Text(r.content, style: const TextStyle(color: Colors.white70)),
+            trailing: Text(
+              r.status,
+              style: TextStyle(color: _getStatusColor(r.status)),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildContributionOverview() {
+    return _card(
+      Column(
+        children: contributors.map((c) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  backgroundColor: const Color(0xFF4FD1C5),
+                  child: Text(c.name[0], style: const TextStyle(color: Colors.black)),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(c.name, style: const TextStyle(color: Colors.white)),
+                ),
+                Text(
+                  '${c.contributionCount}',
+                  style: const TextStyle(color: Color(0xFF4FD1C5)),
+                ),
+              ],
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  // ---------------- HELPERS ----------------
+
+  Widget _card(Widget child) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF2D3748),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: child,
+    );
+  }
+
+  Widget _stat(String label, int value, Color color) {
+    return Column(
+      children: [
+        Text(
+          '$value',
+          style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 4),
+        Text(label, style: TextStyle(color: color)),
+      ],
+    );
+  }
+
+  InputDecoration _inputDecoration(String hint, {IconData? icon}) {
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: const TextStyle(color: Colors.grey),
+      prefixIcon: icon != null ? Icon(icon, color: const Color(0xFF4FD1C5)) : null,
+      filled: true,
+      fillColor: const Color(0xFF1A1F26),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide.none,
+      ),
+    );
+  }
+
   List<Remark> _getFilteredRemarks() {
-    return remarks.where((remark) {
-      bool matchesUser = _selectedUser == 'All Users' || remark.user == _selectedUser;
-      bool matchesSearch = _searchQuery.isEmpty || 
-          remark.content.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          remark.user.toLowerCase().contains(_searchQuery.toLowerCase());
-      
-      return matchesUser && matchesSearch;
+    return remarks.where((r) {
+      final userOk = _selectedUser == 'All Users' || r.user == _selectedUser;
+      final searchOk =
+          _searchQuery.isEmpty || r.content.toLowerCase().contains(_searchQuery.toLowerCase());
+      return userOk && searchOk;
     }).toList();
   }
 
   Color _getStatusColor(String status) {
-    switch (status) {
-      case 'Active':
-        return Colors.orange.shade600;
-      case 'Resolved':
-        return Colors.green.shade600;
-      default:
-        return Colors.grey.shade600;
-    }
-  }
-
-  String _formatDateTime(DateTime dateTime) {
-    final now = DateTime.now();
-    final difference = now.difference(dateTime);
-    
-    if (difference.inDays > 0) {
-      return '${difference.inDays} days ago';
-    } else if (difference.inHours > 0) {
-      return '${difference.inHours} hours ago';
-    } else if (difference.inMinutes > 0) {
-      return '${difference.inMinutes} minutes ago';
-    } else {
-      return 'Just now';
-    }
+    return status == 'Active' ? Colors.orange : Colors.green;
   }
 
   void _addNewRemark() {
-    if (_remarkController.text.trim().isEmpty) return;
+    if (_remarkController.text.isEmpty) return;
 
     setState(() {
-      remarks.insert(0, Remark(
-        id: (remarks.length + 1).toString(),
-        user: 'Current User', // In a real app, this would be the logged-in user
-        content: _remarkController.text.trim(),
-        timestamp: DateTime.now(),
-        status: 'Active',
-        contributors: ['Current User'],
-      ));
+      remarks.insert(
+        0,
+        Remark(
+          id: DateTime.now().toString(),
+          user: 'Current User',
+          content: _remarkController.text,
+          timestamp: DateTime.now(),
+          status: 'Active',
+          contributors: ['Current User'],
+        ),
+      );
       _remarkController.clear();
     });
   }

@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'widgets/custom_app_bar.dart';
-import 'widgets/app_drawer.dart';
 
 // Task model for team view
 class TeamTask {
@@ -46,18 +44,16 @@ class TeamViewPage extends StatefulWidget {
 
 class _TeamViewPageState extends State<TeamViewPage> {
   String _selectedTeamMember = 'Alice Johnson';
-  
-  // Sample team members data
-  List<TeamMember> teamMembers = [
-    TeamMember(name: 'Alice Johnson', totalTasks: 24, closedTasks: 18, inProgressTasks: 4, percentComplete: 75.0),
+
+  final List<TeamMember> teamMembers = [
+    TeamMember(name: 'Alice Johnson', totalTasks: 24, closedTasks: 18, inProgressTasks: 4, percentComplete: 75),
     TeamMember(name: 'Bob Smith', totalTasks: 18, closedTasks: 12, inProgressTasks: 3, percentComplete: 66.7),
     TeamMember(name: 'Carol Davis', totalTasks: 30, closedTasks: 22, inProgressTasks: 6, percentComplete: 73.3),
     TeamMember(name: 'David Wilson', totalTasks: 15, closedTasks: 10, inProgressTasks: 2, percentComplete: 66.7),
     TeamMember(name: 'Emma Thompson', totalTasks: 22, closedTasks: 16, inProgressTasks: 4, percentComplete: 72.7),
   ];
-  
-  // Sample tasks data
-  List<TeamTask> allTasks = [
+
+  final List<TeamTask> allTasks = [
     TeamTask(id: '1', item: 'Complete project proposal', priority: 'High', status: 'Closed', dueDate: DateTime.now().subtract(const Duration(days: 2)), responsible: 'Alice Johnson'),
     TeamTask(id: '2', item: 'Review quarterly reports', priority: 'Medium', status: 'In Progress', dueDate: DateTime.now().add(const Duration(days: 3)), responsible: 'Alice Johnson'),
     TeamTask(id: '3', item: 'Prepare client presentation', priority: 'High', status: 'In Progress', dueDate: DateTime.now().add(const Duration(days: 1)), responsible: 'Alice Johnson'),
@@ -69,100 +65,32 @@ class _TeamViewPageState extends State<TeamViewPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF1A1F26),
-      appBar: CustomAppBar(
-        title: 'Team View',
-        onMenuPressed: () {
-          Scaffold.of(context).openDrawer();
-        },
-        onNotificationPressed: () {
-          // Handle notification tap
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Notifications tapped')),
-          );
-        },
-        onProfilePressed: () {
-          // Handle profile tap
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Profile tapped')),
-          );
-        },
-      ),
-      drawer: AppDrawer(
-        userName: 'John Doe',
-        userEmail: 'john.doe@example.com',
-        onLogout: () {
-          // Handle logout
-          Navigator.pop(context);
-          Navigator.pushNamedAndRemoveUntil(
-            context,
-            '/login',
-            (route) => false,
-          );
-        },
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Team member dropdown
-              Container(
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF2D3748),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: DropdownButtonFormField<String>(
-                  initialValue: _selectedTeamMember,
-                  decoration: const InputDecoration(
-                    labelText: 'Select Team Member',
-                    labelStyle: TextStyle(color: Color(0xFF4FD1C5)),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(8)),
-                    ),
-                    filled: true,
-                    fillColor: Color(0xFF1A1F26),
-                  ),
-                  dropdownColor: const Color(0xFF2D3748),
-                  style: const TextStyle(color: Colors.white),
-                  items: teamMembers.map((TeamMember member) {
-                    return DropdownMenuItem<String>(
-                      value: member.name,
-                      child: Text(member.name),
-                    );
-                  }).toList(),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      _selectedTeamMember = newValue!;
-                    });
-                  },
-                ),
-              ),
-              
-              const SizedBox(height: 24),
-              
-              // Team member stats
-              _buildStatsCard(),
-              
-              const SizedBox(height: 24),
-              
-              // Tasks for selected team member
-              _buildSectionHeader('Tasks for $_selectedTeamMember'),
-              const SizedBox(height: 12),
-              _buildTasksList(),
-            ],
-          ),
-        ),
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          // 👤 Team member dropdown
+          _memberDropdown(),
+          const SizedBox(height: 24),
+
+          // 📊 Stats
+          _statsCard(),
+          const SizedBox(height: 24),
+
+          // 📋 Tasks
+          _sectionTitle('Tasks for $_selectedTeamMember'),
+          const SizedBox(height: 12),
+          _taskList(),
+        ]),
       ),
     );
   }
 
-  Widget _buildSectionHeader(String title) {
+  // ---------------- UI HELPERS ----------------
+
+  Widget _sectionTitle(String text) {
     return Text(
-      title,
+      text,
       style: const TextStyle(
         color: Color(0xFF4FD1C5),
         fontSize: 18,
@@ -171,138 +99,84 @@ class _TeamViewPageState extends State<TeamViewPage> {
     );
   }
 
-  Widget _buildStatsCard() {
-    final member = teamMembers.firstWhere(
-      (member) => member.name == _selectedTeamMember,
-      orElse: () => TeamMember(
-        name: 'Unknown',
-        totalTasks: 0,
-        closedTasks: 0,
-        inProgressTasks: 0,
-        percentComplete: 0.0,
-      ),
-    );
-
+  Widget _memberDropdown() {
     return Container(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: const Color(0xFF2D3748),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Column(
-        children: [
-          // Stats row 1
-          Row(
-            children: [
-              Expanded(
-                child: _buildStatBox('Total Tasks', member.totalTasks.toString(), Colors.blue.shade600),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildStatBox('Closed', member.closedTasks.toString(), Colors.green.shade600),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          // Stats row 2
-          Row(
-            children: [
-              Expanded(
-                child: _buildStatBox('In Progress', member.inProgressTasks.toString(), Colors.orange.shade600),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildPercentBox('Complete', member.percentComplete),
-              ),
-            ],
-          ),
-        ],
+      child: DropdownButtonFormField<String>(
+        value: _selectedTeamMember,
+        dropdownColor: const Color(0xFF2D3748),
+        style: const TextStyle(color: Colors.white),
+        decoration: const InputDecoration(
+          labelText: 'Select Team Member',
+          labelStyle: TextStyle(color: Color(0xFF4FD1C5)),
+          filled: true,
+          fillColor: Color(0xFF1A1F26),
+          border: OutlineInputBorder(),
+        ),
+        items: teamMembers
+            .map((m) => DropdownMenuItem(value: m.name, child: Text(m.name)))
+            .toList(),
+        onChanged: (val) => setState(() => _selectedTeamMember = val!),
       ),
     );
   }
 
-  Widget _buildStatBox(String title, String value, Color color) {
+  Widget _statsCard() {
+    final m = teamMembers.firstWhere((e) => e.name == _selectedTeamMember);
+
     return Container(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1F26),
-        borderRadius: BorderRadius.circular(8),
+        color: const Color(0xFF2D3748),
+        borderRadius: BorderRadius.circular(12),
       ),
-      child: Column(
-        children: [
-          Text(
-            value,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            title,
-            style: TextStyle(
-              color: Colors.grey.shade400,
-              fontSize: 14,
-            ),
-          ),
-        ],
-      ),
+      child: Column(children: [
+        Row(children: [
+          _statBox('Total', m.totalTasks.toString()),
+          const SizedBox(width: 16),
+          _statBox('Closed', m.closedTasks.toString()),
+        ]),
+        const SizedBox(height: 16),
+        Row(children: [
+          _statBox('In Progress', m.inProgressTasks.toString()),
+          const SizedBox(width: 16),
+          _statBox('Complete', '${m.percentComplete.toStringAsFixed(1)}%'),
+        ]),
+      ]),
     );
   }
 
-  Widget _buildPercentBox(String title, double value) {
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1A1F26),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        children: [
-          Text(
-            '${value.toStringAsFixed(1)}%',
-            style: const TextStyle(
-              color: Color(0xFF4FD1C5),
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            title,
-            style: TextStyle(
-              color: Colors.grey.shade400,
-              fontSize: 14,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTasksList() {
-    final tasksForMember = allTasks.where(
-      (task) => task.responsible == _selectedTeamMember,
-    ).toList();
-
-    if (tasksForMember.isEmpty) {
-      return Container(
-        padding: const EdgeInsets.all(16.0),
+  Widget _statBox(String title, String value) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: const Color(0xFF2D3748),
-          borderRadius: BorderRadius.circular(12),
+          color: const Color(0xFF1A1F26),
+          borderRadius: BorderRadius.circular(8),
         ),
-        child: const Center(
-          child: Text(
-            'No tasks assigned to this team member',
-            style: TextStyle(
-              color: Colors.grey,
-              fontStyle: FontStyle.italic,
-            ),
-          ),
-        ),
-      );
+        child: Column(children: [
+          Text(value,
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold)),
+          const SizedBox(height: 6),
+          Text(title, style: const TextStyle(color: Colors.grey)),
+        ]),
+      ),
+    );
+  }
+
+  Widget _taskList() {
+    final tasks =
+        allTasks.where((t) => t.responsible == _selectedTeamMember).toList();
+
+    if (tasks.isEmpty) {
+      return _emptyBox('No tasks assigned');
     }
 
     return Container(
@@ -313,93 +187,64 @@ class _TeamViewPageState extends State<TeamViewPage> {
       child: ListView.separated(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        itemCount: tasksForMember.length,
-        separatorBuilder: (context, index) => const Divider(height: 1, color: Color(0xFF1A1F26)),
-        itemBuilder: (context, index) {
-          final task = tasksForMember[index];
-          return ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            title: Text(
-              task.item,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            subtitle: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Due: ${_formatDate(task.dueDate)}',
-                    style: const TextStyle(
-                      color: Colors.grey,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: _getPriorityColor(task.priority),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    task.priority,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            trailing: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: _getStatusColor(task.status),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                task.status,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                ),
-              ),
-            ),
-          );
-        },
+        itemCount: tasks.length,
+        separatorBuilder: (_, __) =>
+            const Divider(height: 1, color: Color(0xFF1A1F26)),
+        itemBuilder: (_, i) => _taskTile(tasks[i]),
       ),
     );
   }
 
-  Color _getStatusColor(String status) {
-    switch (status) {
-      case 'Closed':
-        return Colors.green.shade600;
-      case 'In Progress':
-        return Colors.orange.shade600;
-      case 'Pending':
-        return Colors.grey.shade600;
-      default:
-        return Colors.blue.shade600;
-    }
+  Widget _taskTile(TeamTask task) {
+    return ListTile(
+      title: Text(task.item,
+          style: const TextStyle(color: Colors.white)),
+      subtitle: Text(
+        'Due: ${task.dueDate.day}/${task.dueDate.month}/${task.dueDate.year}',
+        style: const TextStyle(color: Colors.grey, fontSize: 12),
+      ),
+      trailing: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _badge(task.priority, _priorityColor(task.priority)),
+          const SizedBox(height: 4),
+          _badge(task.status, _statusColor(task.status)),
+        ],
+      ),
+    );
   }
 
-  Color _getPriorityColor(String priority) {
-    switch (priority) {
-      case 'High':
-        return Colors.red.shade600;
-      case 'Medium':
-        return Colors.orange.shade600;
-      case 'Low':
-        return Colors.green.shade600;
-      default:
-        return Colors.grey.shade600;
-    }
+  Widget _badge(String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration:
+          BoxDecoration(color: color, borderRadius: BorderRadius.circular(12)),
+      child: Text(text,
+          style: const TextStyle(color: Colors.white, fontSize: 11)),
+    );
   }
 
-  String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year}';
+  Widget _emptyBox(String text) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF2D3748),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Center(
+        child: Text(text,
+            style: const TextStyle(color: Colors.grey)),
+      ),
+    );
   }
+
+  Color _priorityColor(String p) =>
+      p == 'High' ? Colors.red :
+      p == 'Medium' ? Colors.orange :
+      Colors.green;
+
+  Color _statusColor(String s) =>
+      s == 'Closed' ? Colors.green :
+      s == 'In Progress' ? Colors.orange :
+      Colors.grey;
 }

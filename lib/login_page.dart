@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'home_page.dart'; // Import the home page
 import 'dashboard_page.dart'; // Import the dashboard page
 import 'widgets/custom_app_bar.dart';
+
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -19,24 +21,19 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF1A1F26),
-      appBar: CustomAppBar(
-        title: 'Login',
-        onMenuPressed: () {
-          Scaffold.of(context).openDrawer();
-        },
-        onNotificationPressed: () {
-          // Handle notification tap
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Notifications tapped')),
-          );
-        },
-        onProfilePressed: () {
-          // Handle profile tap
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Profile tapped')),
-          );
-        },
-      ),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF1A1F26),
+        elevation: 0,
+        title: const Text(
+          'Login',
+          style: TextStyle(
+            color: Color(0xFF4FD1C5),
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+      ), // Simple AppBar for login page without navigation drawer
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -225,7 +222,7 @@ class _LoginPageState extends State<LoginPage> {
                       Future.delayed(const Duration(seconds: 1), () {
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (context) => const DashboardPage()),
+                          MaterialPageRoute(builder: (context) => const HomePage()),
                         );
                       });
                     }
